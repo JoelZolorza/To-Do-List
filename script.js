@@ -5,7 +5,21 @@ const botonEnter = document.querySelector('#enter');
 const check = 'fa-check-circle';
 const unCheck = 'fa-circle';
 const lineThrough = 'line-through';
-let id = 0;
+let id 
+//Array
+let LIST 
+
+
+
+
+
+
+
+//Creacion de fecha
+const Fecha = new Date()
+fecha.innerHTML = Fecha.toLocaleDateString('es-AR',{weekday:'long',month:'short',day:'numeric'})
+
+
 
 //funcion agregar tarea
 
@@ -30,24 +44,41 @@ function agregarTarea(tarea, id, realizado, eliminado){
 
 //funcion tarea Realizada
 
-function tareaRealizda(element){
+function tareaRealizada(element){
     element.classList.toggle(check)
     element.classList.toggle(unCheck)
     element.parentNode.querySelector('.text').classList.toggle(lineThrough)
+    LIST(element.id).realizado = LIST(element.id).realizado ? false : true
+}
+
+//funcion de tarea eliminada
+
+function tareaEliminada(element) {
+    element.parentNode.parentNode.removeChild(element.parentNode)
+    LIST(element.id).eliminado = true
 }
 
 
 
-//Tarea Eliminada
-function tareaEliminada(){}
+
+
 
 botonEnter.addEventListener('click',()=>{
     const tarea = input.value
     if(tarea) {
         agregarTarea(tarea, id, false, false)
+        LIST.push({
+            nombre: tarea,
+            id: id,
+            realizado:false,
+            eliminado:false
+
+        })
     }
+    localStorage.setItem('ToDoList', JSON.stringify(LIST))
     input.value = ''
     id++
+    console.log(LIST)
 });
 
 
@@ -56,9 +87,18 @@ document.addEventListener('keyup', function (event){
         const tarea = input.value
         if(tarea){
             agregarTarea(tarea, id, false, false)
+            LIST.push({
+                nombre: tarea,
+                id: id,
+                realizado:false,
+                eliminado:false
+    
+            })
         }
+        localStorage.setItem('ToDoList', JSON.stringify(LIST))
         input.value=''
         id++
+        console.log(LIST)
     }
 })
 
@@ -66,12 +106,29 @@ lista.addEventListener('click', function(event){
     const element = event.target
     const elementData = element.attributes.data.value
     if(elementData === 'realizado'){
-        tareaRealizda(element)
+        tareaRealizada(element)
     }
     else if (elementData === 'eliminado') {
         tareaEliminada(element)
     }
+    localStorage.setItem('ToDoList', JSON.stringify(LIST))
 })
 
 
+//Local Storage get Item
+let data = localStorage.getItem('ToDoList')
+if(data){
+    LIST = JSON.parse(data)
+    id = LIST.length
+    cargarLista(LIST)
 
+}else{
+    LIST = []
+    id = 0 
+}
+
+function cargarLista(DATA) {
+    DATA.forEach(function(i) {
+        agregarTarea(i.nombre,i.id,i.realizado,i.eliminado)
+    });
+}
